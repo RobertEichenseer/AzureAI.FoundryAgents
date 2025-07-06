@@ -42,24 +42,6 @@ This functionw retrieve the necessary information—such as the winner or result
   
 ---
 
-## Azure AI Foundry Agent Service Overview
-
-Azure AI Foundry Agent Service enables the creation, deployment, and orchestration of intelligent agents powered by large language models (LLMs). Agents can be enhanced with custom tools (functions) and can interact with each other to solve complex tasks.
-
----
-
-
-## Getting Started
-
-1. **Clone the repository.**
-2. **Deploy Azure resources:**
-   - Edit `setup/parameters.json` as needed.
-   - Run `setup/setup.azcli` in a PowerShell or Azure CLI environment.
-3. **Open the notebooks in Visual Studio Code with the .NET Interactive extension.**
-4. **Run the notebooks step by step, following the instructions in each cell.**
-
----
-
 ## Notes
 
 - The sample agents and tools are for demonstration purposes and use hardcoded responses.
