@@ -1,0 +1,89 @@
+###############################
+# Set variables
+###############################
+$location = "swedencentral"
+$bicepFile = "./setup/setup.bicep"
+$parameterFile = "./setup/parameters.json"
+
+###############################
+# Login to Azure
+###############################
+$loggedIn = az account show --query "name" -o tsv
+
+if ($loggedIn -ne $null) {
+    Write-Host "Already logged in as $loggedIn"
+} else {
+    Write-Host "Logging in..."
+    az login
+}
+
+# Retrieve default subscription id
+$subscriptionId = (
+    az account list `
+        --query "[?isDefault].id" `
+        -o tsv
+)
+
+# Set Subscription
+az account set `
+    --subscription $subscriptionId
+
+##########################################
+# Create resource group
+##########################################
+$resourceGroup = "AzureAI.FoundryAgents"
+az group create `
+    --name $resourceGroup `
+    --location $location
+
+##########################################
+# Validate and deploy bicep file 
+##########################################
+# Validate bicep file
+az bicep build `
+    --file $bicepFile
+
+# Deploy bicep file
+$deploymentName = "foundry-agents-deployment"
+az deployment group create `
+    --resource-group $resourceGroup `
+    --template-file $bicepFile `
+    --name $deploymentName `
+    --parameters "@$parameterFile"
+
+###############################################
+# Retrieve deployment parameters
+###############################################
+$deploymentOutputs = az deployment group show `
+  --resource-group $resourceGroup `
+  --name $deploymentName `
+  --query properties.outputs `
+  --output json
+
+$foundryEndpoint = ( `
+    $deploymentOutputs | ConvertFrom-Json `
+).projectEndpoint.value
+
+$modelDeploymentName = ( `
+    $deploymentOutputs | ConvertFrom-Json `
+).deploymentName.value
+
+
+##########################################
+# Store configuration in ./config/config.env
+##########################################
+$configurationFile = "./config/config.env"
+if (-not (Test-Path $configurationFile)) {
+    New-Item -Path $configurationFile -ItemType File -Force
+}
+function Set-ConfigurationFileVariable($configurationFile, $variableName, $variableValue) {
+    if (Select-String -Path $configurationFile -Pattern $variableName) {
+        (Get-Content $configurationFile) | Foreach-Object {
+            $_ -replace "$variableName = .*", "$variableName = $variableValue"
+        } | Set-Content $configurationFile
+    } else {
+        Add-Content -Path $configurationFile -value "$variableName = $variableValue"
+    }
+}
+Set-ConfigurationFileVariable $configurationFile "SDK_FOUNDRY_ENDPOINT" $foundryEndpoint
+Set-ConfigurationFileVariable $configurationFile "SDK_FOUNDRY_DEPLOYMENTNAME" $modelDeploymentName
