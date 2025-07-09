@@ -38,7 +38,7 @@ This functionw retrieve the necessary information—such as the winner or result
 | [./setup](./setup/) | [setup.bicep](./setup/setup.bicep) | bicep file to create all necessary Azure services |
 | [./setup](./setup/) | [setup.bicep](./setup/parameters.json) | parameters file to define service names, region etc.
 | [./src](./src/) | [LocalToolCallingAgent.ipynb](./src/LocalToolCallingAgent.ipynb) | Notebook with c# code to highlight how to use local functions as tools for hosted agents |
-| [./src](./src/) | [LocalToolCallingAgent.ipynb](./src/ConnectedAgents.ipynb) | Notebook with c# code to highlight how to orchestrate multiple specialized agents using a connected/orchestrator agent. |
+| [./src](./src/) | [ConnectedAgents.ipynb](./src/ConnectedAgents.ipynb) | Notebook with c# code to highlight how to orchestrate multiple specialized agents using a connected/orchestrator agent. |
   
 ---
 
